@@ -21,8 +21,14 @@ const resolvers = {
       const [rows, fields] = await connection.query(
         'SELECT * FROM operazioni'
       )
-      connection.release()
-      return rows
+      const res = rows.map(async (o)=>{
+        const [conti] = await connection.query('SELECT * FROM conti WHERE id = ?',[o.Conto_id])
+        console.log(o, conti);
+        o.Conto_id = conti[0];
+        return o;
+      })
+      connection.release();
+      return res
     },
     conti: async () =>{
 

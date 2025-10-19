@@ -8,7 +8,7 @@ type Operazione{
   ID: ID,
   Importo: Float,
   Descrizione: String,
-  Conto_id: Int
+  Conto_id: Conto
 }
 
 type Query {
