@@ -2,13 +2,14 @@ const schema = `
 type Conto {
   ID: ID,
   Nome: String,
+  Operazioni: [Operazione]
 }
 
 type Operazione{
   ID: ID,
   Importo: Float,
   Descrizione: String,
-  Conto_id: Conto
+  Conto: Conto
 }
 
 type Query {

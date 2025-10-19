@@ -19,19 +19,12 @@ const resolvers = {
 
       const connection = await fastify.mysql.getConnection();
       const [rows, fields] = await connection.query(
-        'SELECT * FROM operazioni'
+        'SELECT ID, Importo, Descrizione, Conto_id as Conto FROM operazioni'
       )
-      const res = rows.map(async (o)=>{
-        const [conti] = await connection.query('SELECT * FROM conti WHERE id = ?',[o.Conto_id])
-        console.log(o, conti);
-        o.Conto_id = conti[0];
-        return o;
-      })
       connection.release();
-      return res
+      return rows;
     },
     conti: async () =>{
-
       const connection = await fastify.mysql.getConnection();
       const [rows, fields] = await connection.query(
         'SELECT * FROM conti'
@@ -39,6 +32,21 @@ const resolvers = {
       connection.release()
       return rows
     },
+  },
+  Operazione: {
+    Conto: async function(parent){
+      const connection = await fastify.mysql.getConnection();
+      const [conti] = await connection.query('SELECT * FROM conti WHERE id = ?',[parent.Conto])
+      return conti[0];
+    }
+  },
+  Conto:{
+    Operazioni: async function (parent) {
+      console.log(parent);
+      const connection = await fastify.mysql.getConnection();
+      const [operazioni] = await connection.query('SELECT * FROM operazioni where Conto_id = ?',[parent.ID])
+      return operazioni;
+    }
   }
 }
 
