@@ -4,35 +4,14 @@ import fastifyMysql from "@fastify/mysql";
 import contiRoutes from "./routes/conti.js";
 import operazioniRoutes from "./routes/operazioni.js";
 import schema from './schema.js'
+import QueryResolver from "./resolvers/Query.js";
 const fastify = Fastify({
   logger: true
 });
 
 const { DB_USERNAME: dbUser, DB_PASSWORD: dbPass, DB_NAME: dbName, DB_HOST: dbHost } = process.env;
-fastify.get('/', function (request, response) {
- response.send({hello:'world'})
-})
 const resolvers = {
-  Query: {
-    hello: async()=>"hello with graphql",
-    operazioni: async () =>{
-
-      const connection = await fastify.mysql.getConnection();
-      const [rows, fields] = await connection.query(
-        'SELECT ID, Importo, Descrizione, Conto_id as Conto FROM operazioni'
-      )
-      connection.release();
-      return rows;
-    },
-    conti: async () =>{
-      const connection = await fastify.mysql.getConnection();
-      const [rows, fields] = await connection.query(
-        'SELECT * FROM conti'
-      )
-      connection.release()
-      return rows
-    },
-  },
+  Query: QueryResolver(fastify),
   Operazione: {
     Conto: async function(parent){
       const connection = await fastify.mysql.getConnection();
