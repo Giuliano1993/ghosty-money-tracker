@@ -5,6 +5,8 @@ import contiRoutes from "./routes/conti.js";
 import operazioniRoutes from "./routes/operazioni.js";
 import schema from './schema.js'
 import QueryResolver from "./resolvers/Query.js";
+import OperazioneResolver from "./resolvers/Operazione.js";
+import ContoResolver from "./resolvers/Conto.js";
 const fastify = Fastify({
   logger: true
 });
@@ -12,23 +14,26 @@ const fastify = Fastify({
 const { DB_USERNAME: dbUser, DB_PASSWORD: dbPass, DB_NAME: dbName, DB_HOST: dbHost } = process.env;
 const resolvers = {
   Query: QueryResolver(fastify),
-  Operazione: {
-    Conto: async function(parent){
+  Operazione: OperazioneResolver(fastify),
+  Conto: ContoResolver(fastify),
+  Mutation: {
+    CreateOperazione: async (parent, args, context) => {
+      const { input } = args;
+      context.app.log.info('Creting operazione', input)
       const connection = await fastify.mysql.getConnection();
-      const [conti] = await connection.query('SELECT * FROM conti WHERE id = ?',[parent.Conto])
-      return conti[0];
-    }
-  },
-  Conto:{
-    Operazioni: async function (parent) {
-      console.log(parent);
-      const connection = await fastify.mysql.getConnection();
-      const [operazioni] = await connection.query('SELECT * FROM operazioni where Conto_id = ?',[parent.ID])
-      return operazioni;
+      const result = await connection.query("INSERT INTO operazioni (descrizione, importo, tipo, conto_id) VALUES (?, ?, ?, ?)", [input.Descrizione, input.Importo, input.Tipo, input.Conto]);
+      console.log(result)
+      console.log(result[0])
+      const [rows] = await connection.query("SELECT * FROM operazioni WHERE id = ?", [result[0].insertId]);
+      console.log(rows)
+      connection.release()
+      return rows[0];
+
     }
   }
 }
 
+const mutations =
 fastify.register(contiRoutes);
 fastify.register(operazioniRoutes);
 

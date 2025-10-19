@@ -12,10 +12,20 @@ type Operazione{
   Conto: Conto
 }
 
+input CreateOperazioneInput{
+  Importo: Float!,
+  Descrizione:String!
+  Conto: Int!,
+  Tipo: String!
+}
 type Query {
   hello: String,
   operazioni: [Operazione],
   conti: [Conto]
 }
+type Mutation{
+  CreateOperazione(input: CreateOperazioneInput) : Operazione!
+}
+
 `
 export default schema
