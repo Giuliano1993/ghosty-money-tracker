@@ -40,8 +40,10 @@ fastify.register(contiRoutes);
 fastify.register(operazioniRoutes);
 
 fastify.register(fastifyMysql, {
-  //why zed are you blocking my backthick
-  connectionString: "mysql://"+dbUser+":"+dbPass+"@"+dbHost+"/"+dbName,
+  user:dbUser,
+  password:dbPass,
+  host:dbHost,
+  database:dbName,
   promise: true
 })
 fastify.register(import('mercurius'),{
