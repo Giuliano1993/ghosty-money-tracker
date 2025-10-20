@@ -22,12 +22,34 @@ const resolvers = {
       context.app.log.info('Creting operazione', input)
       const connection = await fastify.mysql.getConnection();
       const result = await connection.query("INSERT INTO operazioni (descrizione, importo, tipo, conto_id) VALUES (?, ?, ?, ?)", [input.Descrizione, input.Importo, input.Tipo, input.Conto]);
-      console.log(result)
-      console.log(result[0])
       const [rows] = await connection.query("SELECT * FROM operazioni WHERE id = ?", [result[0].insertId]);
-      console.log(rows)
       connection.release()
       return rows[0];
+    },
+    CreateConto: async (parent, args, context) => {
+      const { input } = args;
+      context.app.log.info("Creating Conto", input)
+      const connection = await fastify.mysql.getConnection();
+      const result = await connection.query("INSERT INTO conti (nome) VALUES (?)", [input.Nome]);
+      const [rows] = await connection.query("SELECT * FROM conti WHERE id = ?",[result[0].insertId])
+      connection.release()
+      return rows[0]
+    },
+    CreateGiroconto: async (parent, args, context) => {
+      const { input } = args;
+      context.app.log.info("Creating Giroconto",input)
+      try{
+
+        const connection = await fastify.mysql.getConnection();
+        const resultFrom = await connection.query("INSERT INTO operazioni (descrizione, conto_id, importo, tipo) VALUES (?,?,?,?)",["Giroconto in uscita", input.ContoFrom, input.Importo, "Uscita"])
+        const resultTo = await connection.query("INSERT INTO operazioni (descrizione, conto_id, importo, tipo) VALUES (?,?,?,?)",["Giroconto in entrata", input.ContoTo, input.Importo, "Entrata"])
+        connection.release()
+        return true
+      }catch(err){
+        connection.release()
+        return false
+      }
+
 
     }
   }

@@ -23,6 +23,8 @@ function QueryResolver(fastify) {
       connection.release()
       return rows
     },
+    //TODO
+    //totalePatrimonio
   }
 }
 export default QueryResolver

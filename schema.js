@@ -2,14 +2,16 @@ const schema = `
 type Conto {
   ID: ID,
   Nome: String,
-  Operazioni: [Operazione]
+  Operazioni: [Operazione],
+  Saldo: Float
 }
 
 type Operazione{
   ID: ID,
   Importo: Float,
   Descrizione: String,
-  Conto: Conto
+  Conto: Conto,
+  Tipo: String
 }
 
 input CreateOperazioneInput{
@@ -18,13 +20,24 @@ input CreateOperazioneInput{
   Conto: Int!,
   Tipo: String!
 }
+input CreateContoInput{
+  Nome: String!
+}
+input GirocontoInput{
+  ContoFrom: Int!,
+  ContoTo: Int!,
+  Importo:Float!
+}
 type Query {
   hello: String,
   operazioni: [Operazione],
-  conti: [Conto]
+  conti: [Conto],
+  totalePatrimonio: Float
 }
 type Mutation{
-  CreateOperazione(input: CreateOperazioneInput) : Operazione!
+  CreateOperazione(input: CreateOperazioneInput) : Operazione!,
+  CreateConto(input: CreateContoInput): Conto!,
+  CreateGiroconto(input: GirocontoInput): Boolean
 }
 
 `
