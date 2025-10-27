@@ -6,19 +6,19 @@
 function QueryResolver(fastify) {
   return {
     hello: async()=>"hello with graphql",
-    operazioni: async () =>{
+    transactions: async () =>{
 
       const connection = await fastify.mysql.getConnection();
       const [rows, fields] = await connection.query(
-        'SELECT ID, Importo, Descrizione, Conto_id as Conto FROM operazioni'
+        'SELECT ID, amount, description, Account_id as account FROM transactions'
       )
       connection.release();
       return rows;
     },
-    conti: async () =>{
+    accounts: async () =>{
       const connection = await fastify.mysql.getConnection();
       const [rows, fields] = await connection.query(
-        'SELECT * FROM conti'
+        'SELECT * FROM accounts'
       )
       connection.release()
       return rows
